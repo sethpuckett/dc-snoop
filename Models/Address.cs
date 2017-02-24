@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 
 namespace dc_snoop.Models
 {
-    public class Address
+    public class Address : IEntity
     {
         public int Id { get; set; }
         
@@ -20,5 +20,13 @@ namespace dc_snoop.Models
 
         [JsonIgnore]
         public virtual ICollection<Person> People { get; set; } 
+
+        public string FullAddress
+        {
+            get
+            {
+                return $"{this.Street}, {this.Zip}";
+            }
+        }
     }
 }
