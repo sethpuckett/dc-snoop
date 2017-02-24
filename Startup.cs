@@ -2,11 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using dc_snoop.DAL;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.EntityFrameworkCore;
 
 namespace dc_snoop
 {
@@ -29,6 +31,9 @@ namespace dc_snoop
         {
             // Add framework services.
             services.AddMvc();
+
+            var connectionString = Configuration.GetConnectionString("SnoopDatabase");
+            services.AddEntityFrameworkNpgsql().AddDbContext<SnoopContext>(options => options.UseNpgsql(connectionString));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
