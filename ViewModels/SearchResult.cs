@@ -7,7 +7,7 @@ namespace dc_snoop.ViewModels
 {
     public class SearchResult
     {
-        public SearchResultType Type { get; set; }
+        public string Type { get; set; }
 
         public int Id { get; set; }
 

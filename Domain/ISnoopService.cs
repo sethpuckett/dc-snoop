@@ -18,7 +18,5 @@ namespace dc_snoop.Domain
         Address GetAddress(int id);
 
         IEnumerable<SearchResult> Search(string term);
-
-        IEnumerable<Person> GetPeopleForAddress(int id);
     }
 }

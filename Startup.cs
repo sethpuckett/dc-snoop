@@ -9,6 +9,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
+using dc_snoop.Domain;
+using Newtonsoft.Json;
 
 namespace dc_snoop
 {
@@ -30,10 +32,15 @@ namespace dc_snoop
         public void ConfigureServices(IServiceCollection services)
         {
             // Add framework services.
-            services.AddMvc();
+            services.AddMvc().AddJsonOptions(options => {
+                options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+            });
 
             var connectionString = Configuration.GetConnectionString("SnoopDatabase");
             services.AddEntityFrameworkNpgsql().AddDbContext<SnoopContext>(options => options.UseNpgsql(connectionString));
+        
+            services.AddTransient<ISnoopRepository, SnoopRepository>();
+            services.AddTransient<ISnoopService, SnoopService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

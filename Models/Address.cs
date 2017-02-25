@@ -18,7 +18,6 @@ namespace dc_snoop.Models
 
         public string Ward { get; set; }
 
-        [JsonIgnore]
         public virtual ICollection<Person> People { get; set; } 
 
         public string FullAddress

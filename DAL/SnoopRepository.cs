@@ -19,9 +19,9 @@ namespace dc_snoop.DAL
             return this.Context.Set<TEntity>();
         }
 
-        public TEntity GetById<TEntity>(int id) where TEntity : class, IEntity
+        public IQueryable<TEntity> GetById<TEntity>(int id) where TEntity : class, IEntity
         {
-            return this.Context.Set<TEntity>().SingleOrDefault(e => e.Id == id);
+            return this.Context.Set<TEntity>().Where(e => e.Id == id);
         }
     }
 }

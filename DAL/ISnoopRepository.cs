@@ -10,6 +10,6 @@ namespace dc_snoop.DAL
     {
         IQueryable<TEntity> GetAll<TEntity>() where TEntity : class, IEntity;
 
-        TEntity GetById<TEntity>(int id) where TEntity : class, IEntity;
+        IQueryable<TEntity> GetById<TEntity>(int id) where TEntity : class, IEntity;
     }
 }

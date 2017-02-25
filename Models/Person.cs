@@ -39,7 +39,7 @@ namespace dc_snoop.Models
         {
             get
             {
-                return $"{this.FirstName} ${this.LastName}";
+                return $"{this.FirstName} {this.LastName}";
             }
         }
     }
