@@ -13,14 +13,12 @@ namespace dc_snoop.Domain
     {
         private readonly ISnoopRepository Repository;
 
-        public SnoopService(ISnoopRepository repository)
+        private readonly ISearchHelper SearchHelper;
+
+        public SnoopService(ISnoopRepository repository, ISearchHelper searchHelper)
         {
             this.Repository = repository;
-        }
-
-        public IEnumerable<Person> GetAllPeople()
-        {
-            return this.Repository.GetAll<Person>();
+            this.SearchHelper = searchHelper;
         }
 
         public Person GetPerson(int id)
@@ -28,11 +26,6 @@ namespace dc_snoop.Domain
             return this.Repository.GetById<Person>(id)
                 .Include(p => p.Address)
                 .FirstOrDefault();
-        }
-
-        public IEnumerable<Address> GetAllAddresses()
-        {
-            return this.Repository.GetAll<Address>();
         }
 
         public Address GetAddress(int id)
@@ -44,51 +37,32 @@ namespace dc_snoop.Domain
         public IEnumerable<SearchResult> Search(string term)
         {
             var results = new List<SearchResult>();
-            var personMatches = new List<Person>();
-            var addressMatches = new List<Address>();
-            var addressAggregateMatches = new List<Address>();
+            var allAddressMatches = new List<Address>();
 
-            int tempInt;
-            var ignoreTerms = new List<string> { "ST", "RD", "CT", "LN", "PL" };
-            var termArr = term.ToUpper().Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-            var shortTerms = termArr.Where(t => t.Length <= 2 && !int.TryParse(t, out tempInt) && !ignoreTerms.Contains(t));
-            var longTerms = termArr.Where(t => t.Length > 2 || int.TryParse(t, out tempInt));
+            // Separate long terms (full names, street numbers) from short terms(street letters, quadrants)
+            var shortTerms = this.SearchHelper.GetShortSearchTerms(term);
+            var longTerms = this.SearchHelper.GetLongSearchTerms(term);
 
+            // search all people and address for long term matches
             foreach (var longTerm in longTerms)
             {
-                personMatches = this.Repository.GetAll<Person>()
-                    .Where(p => p.FirstName.Contains(longTerm) || p.LastName.Contains(longTerm))
-                    .Include(p => p.Address)
-                    .ToList();
+                var personMatches = this.SearchHelper.GetLongTermPersonMatches(longTerm);
+                var addressMatches = this.SearchHelper.GetLongTermAddressMatches(longTerm);
 
-                var scoreModifier = 2;
-                if (personMatches.Count < 50 )
-                {
-                    scoreModifier = 4;
-                }
-                else if (personMatches.Count < 200)
-                {
-                    scoreModifier = 3;
-                }
-                
-                addressMatches = this.Repository.GetAll<Address>()
-                    .Where(p => p.StreetName.Contains(longTerm) || p.StreetNumber == longTerm)
-                    .Include(a => a.People)
-                    .ToList();
+                var scoreModifier = this.SearchHelper.GetLongTermCountScoreModifier(personMatches.Count);                
 
-                this.CreateOrUpdatePersonMatches(personMatches, addressAggregateMatches, results, scoreModifier);
-                this.CreateOrUpdateAddressMatches(addressMatches, addressAggregateMatches, results, 2);
+                this.CreateOrUpdatePersonMatches(personMatches, allAddressMatches, results, scoreModifier);
+                this.CreateOrUpdateAddressMatches(addressMatches, allAddressMatches, results, 2);
             }
 
+            // because short terms can match on so many addresses, only use to modify score from long term matches
             foreach (var shortTerm in shortTerms)
             {
-                addressMatches = addressAggregateMatches
-                    .Where(p => p.StreetName == shortTerm).Distinct().ToList();
-                this.CreateOrUpdateAddressMatches(addressMatches, addressAggregateMatches, results, 2);  
+                var addressShortMatches = this.SearchHelper.GetShortTermAddressMatches(allAddressMatches, shortTerm);
 
-                addressMatches = addressAggregateMatches
-                    .Where(p => p.StreetQuadrant == shortTerm).Distinct().ToList();
-                this.CreateOrUpdateAddressMatches(addressMatches, addressAggregateMatches, results, 1);                
+                var shortScoreModifier = this.SearchHelper.GetShortTermCountScoreModifier(addressShortMatches.Count);
+
+                this.CreateOrUpdateAddressMatches(addressShortMatches, allAddressMatches, results, shortScoreModifier);  
             }
 
             return results

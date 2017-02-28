@@ -41,6 +41,7 @@ namespace dc_snoop
         
             services.AddTransient<ISnoopRepository, SnoopRepository>();
             services.AddTransient<ISnoopService, SnoopService>();
+            services.AddTransient<ISearchHelper, SearchHelper>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
