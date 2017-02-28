@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using dc_snoop.Models;
+using dc_snoop.ViewModels;
 
 namespace dc_snoop.Domain
 {
@@ -18,5 +19,11 @@ namespace dc_snoop.Domain
         List<Address> GetLongTermAddressMatches(string term);
 
         List<Address> GetShortTermAddressMatches(IEnumerable<Address> searchList, string term);
+
+        void UpdatePersonSearchResults(IEnumerable<Person> matches, IList<SearchResult> searchResults, int strengthModifier);
+
+        void UpdateAddressSearchResults(List<Address> matches, List<SearchResult> searchResults, int strengthModifier);
+
+        void UpdateResidentSearchResults(List<Address> matches, List<SearchResult> searchResults, int strengthModifier);
     }
 }

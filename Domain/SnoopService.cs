@@ -51,9 +51,16 @@ namespace dc_snoop.Domain
 
                 var scoreModifier = this.SearchHelper.GetLongTermCountScoreModifier(personMatches.Count);                
 
-                this.CreateOrUpdatePersonMatches(personMatches, allAddressMatches, results, scoreModifier);
-                this.CreateOrUpdateAddressMatches(addressMatches, allAddressMatches, results, 2);
+                this.SearchHelper.UpdatePersonSearchResults(personMatches, results, scoreModifier);
+                this.SearchHelper.UpdateAddressSearchResults(addressMatches, results, 2);
+                this.SearchHelper.UpdateResidentSearchResults(addressMatches, results, 2);
+
+                allAddressMatches.AddRange(personMatches.Select(p => p.Address));
+                allAddressMatches.AddRange(addressMatches);
             }
+
+            // remove duplicate addresses from aggregate list.
+            allAddressMatches = allAddressMatches.Distinct().ToList();
 
             // because short terms can match on so many addresses, only use to modify score from long term matches
             foreach (var shortTerm in shortTerms)
@@ -62,77 +69,16 @@ namespace dc_snoop.Domain
 
                 var shortScoreModifier = this.SearchHelper.GetShortTermCountScoreModifier(addressShortMatches.Count);
 
-                this.CreateOrUpdateAddressMatches(addressShortMatches, allAddressMatches, results, shortScoreModifier);  
+                this.SearchHelper.UpdateAddressSearchResults(addressShortMatches, results, shortScoreModifier);
+                this.SearchHelper.UpdateResidentSearchResults(addressShortMatches, results, 2);
             }
 
             return results
                 .Where(r => r.Strength > 3)
                 .OrderByDescending(r => r.Strength)
                 .ThenByDescending(r => r.Type)
-                .ThenBy(r => r.Text);
-        }
-
-        private void CreateOrUpdatePersonMatches(IEnumerable<Person> matches, List<Address> aggregateMatches, IList<SearchResult> results, int strengthModifier)
-        {
-            foreach (var personMatch in matches)
-            {
-                var existingResult = results.SingleOrDefault(r => r.Type == SearchResultType.Person.DisplayName() && r.Id == personMatch.Id);
-
-                if (existingResult == null)
-                {
-                    var addressPortion = personMatch.Address != null ? $" - {personMatch.Address.FullAddress}" : "";
-
-                    results.Add(new SearchResult
-                        {
-                            Type = SearchResultType.Person.DisplayName(),
-                            Id = personMatch.Id,
-                            Text = $"{personMatch.FullName}{addressPortion}",
-                            Strength = strengthModifier
-                        });
-
-                    aggregateMatches.Add(personMatch.Address);
-                }
-                else
-                {
-                    existingResult.Strength += strengthModifier;
-                }
-            }
-        }
-
-        private void CreateOrUpdateAddressMatches(List<Address> matches, List<Address> aggregateMatches, IList<SearchResult> results, int strengthModifier)
-        {
-            foreach (var addressMatch in matches)
-            {
-                var existingResult = results
-                    .SingleOrDefault(r => r.Type == SearchResultType.Address.DisplayName() 
-                        && r.Id == addressMatch.Id);
-
-                var existingPeopleResults = results
-                    .Where(r => r.Type == SearchResultType.Person.DisplayName() 
-                        && addressMatch.People.Select(p => p.Id).Contains(r.Id));
-
-                if (existingResult == null)
-                {
-                    results.Add(new SearchResult 
-                        { 
-                            Type = SearchResultType.Address.DisplayName(), 
-                            Id = addressMatch.Id, 
-                            Text = addressMatch.FullAddress, 
-                            Strength = strengthModifier 
-                        });
-
-                    aggregateMatches.Add(addressMatch);
-                }
-                else
-                {
-                    existingResult.Strength += strengthModifier;
-                }
-
-                foreach(var peopleResult in existingPeopleResults)
-                {
-                    peopleResult.Strength += strengthModifier;
-                }
-            }
+                .ThenBy(r => r.Text)
+                .Take(100);
         }
     }
 }

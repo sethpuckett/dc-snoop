@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using dc_snoop.DAL;
 using dc_snoop.Models;
+using dc_snoop.ViewModels;
 using Microsoft.EntityFrameworkCore;
 
 namespace dc_snoop.Domain
@@ -11,6 +12,7 @@ namespace dc_snoop.Domain
     {
         private readonly ISnoopRepository Repository;
 
+        // ignore common road types
         private readonly List<string> IgnoredTerms = new List<string> { "ST", "RD", "CT", "LN", "PL" };
 
         public SearchHelper(ISnoopRepository repository)
@@ -18,6 +20,7 @@ namespace dc_snoop.Domain
             this.Repository = repository;
         }
 
+        // separate and return the short search terms from a query string
         public List<string> GetShortSearchTerms(string fullQuery)
         {
             int tempInt;
@@ -25,6 +28,7 @@ namespace dc_snoop.Domain
             return termArr.Where(t => t.Length <= 2 && !int.TryParse(t, out tempInt) && !this.IgnoredTerms.Contains(t)).ToList();
         }
 
+        // separate and return the long search terms from a query string
         public List<string> GetLongSearchTerms(string fullQuery)
         {
             int tempInt;
@@ -32,6 +36,7 @@ namespace dc_snoop.Domain
             return termArr.Where(t => t.Length > 2 || int.TryParse(t, out tempInt)).ToList();
         }
 
+        // Return a score modifier for long terms based on the number of matches
         public int GetLongTermCountScoreModifier(int count)
         {
             var scoreModifier = 2;
@@ -48,6 +53,7 @@ namespace dc_snoop.Domain
             return scoreModifier;
         }
 
+        // Return a score modifier for short terms based on the number of matches
         public int GetShortTermCountScoreModifier(int count)
         {
             var scoreModifier = 1;
@@ -64,6 +70,7 @@ namespace dc_snoop.Domain
             return scoreModifier;
         }
 
+        // search the repository for people matching the term
         public List<Person> GetLongTermPersonMatches(string term)
         {
             return this.Repository.GetAll<Person>()
@@ -72,6 +79,7 @@ namespace dc_snoop.Domain
                 .ToList();
         }
 
+        // search the repository for addresses matching the term
         public List<Address> GetLongTermAddressMatches(string term)
         {
             return this.Repository.GetAll<Address>()
@@ -80,9 +88,94 @@ namespace dc_snoop.Domain
                 .ToList();
         }
 
+        // search existing matches for addresses matching the term
         public List<Address> GetShortTermAddressMatches(IEnumerable<Address> searchList, string term)
         {
             return searchList.Where(p => p.StreetName == term || p.StreetQuadrant == term).Distinct().ToList();
+        }
+
+        // Create search result for each person, or increase score if already matched on previous term
+        public void UpdatePersonSearchResults(IEnumerable<Person> matches, IList<SearchResult> searchResults, int strengthModifier)
+        {
+            foreach (var personMatch in matches)
+            {
+                var existingResult = searchResults.SingleOrDefault(r => r.Type == SearchResultType.Person.DisplayName() && r.Id == personMatch.Id);
+
+                if (existingResult == null)
+                {
+                    var result = this.CreatePersonSearchResult(personMatch, strengthModifier);
+                    searchResults.Add(result);
+                }
+                else
+                {
+                    existingResult.Strength += strengthModifier;
+                }
+            }
+        }
+
+        // Create search result for each address, or increase score if already matched on previous term
+        public void UpdateAddressSearchResults(List<Address> matches, List<SearchResult> searchResults, int strengthModifier)
+        {
+            foreach (var addressMatch in matches)
+            {
+                var existingResult = searchResults
+                    .SingleOrDefault(r => r.Type == SearchResultType.Address.DisplayName() 
+                        && r.Id == addressMatch.Id);
+
+                if (existingResult == null)
+                {
+                    var result = this.CreateAddressSearchResult(addressMatch, strengthModifier);
+                    searchResults.Add(result);
+                }
+                else
+                {
+                    existingResult.Strength += strengthModifier;
+                }
+            }
+        }
+
+        // Increase score for person that is a resident of an address if they already matched on another term
+        public void UpdateResidentSearchResults(List<Address> matches, List<SearchResult> searchResults, int strengthModifier)
+        {
+            foreach (var addressMatch in matches)
+            {
+                var existingPeopleResults = searchResults
+                    .Where(r => r.Type == SearchResultType.Person.DisplayName() 
+                        && addressMatch.People.Select(p => p.Id).Contains(r.Id));
+
+                foreach(var peopleResult in existingPeopleResults)
+                {
+                    peopleResult.Strength += strengthModifier;
+                }
+            }
+        }
+
+        private SearchResult CreatePersonSearchResult(Person person, int strength)
+        {
+            return new SearchResult
+                {
+                    Type = SearchResultType.Person.DisplayName(),
+                    Id = person.Id,
+                    Text = this.GetPersonSearchResultText(person),
+                    Strength = strength
+                };
+        }
+
+        private SearchResult CreateAddressSearchResult(Address address, int strength)
+        {
+            return new SearchResult 
+                { 
+                    Type = SearchResultType.Address.DisplayName(), 
+                    Id = address.Id, 
+                    Text = address.FullAddress, 
+                    Strength = strength 
+                };
+        }
+
+        private string GetPersonSearchResultText(Person person)
+        {
+            var addressPortion = person.Address != null ? $" - {person.Address.FullAddress}" : "";
+            return $"{person.FullName}{addressPortion}";
         }
     }
 }
