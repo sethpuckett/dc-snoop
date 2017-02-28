@@ -12,6 +12,14 @@ namespace dc_snoop.Models
         
         public string Street { get; set; }
 
+        public string StreetNumber { get; set; }
+
+        public string StreetName { get; set; }
+
+        public string StreetType { get; set; }
+
+        public string StreetQuadrant { get; set; }
+
         public string Zip { get; set; }
 
         public string Precinct { get; set; }

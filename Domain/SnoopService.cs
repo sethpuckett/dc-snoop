@@ -44,33 +44,61 @@ namespace dc_snoop.Domain
         public IEnumerable<SearchResult> Search(string term)
         {
             var results = new List<SearchResult>();
+            var personMatches = new List<Person>();
+            var addressMatches = new List<Address>();
+            var addressAggregateMatches = new List<Address>();
 
-            var termArr = term.ToLower().Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-            
-            // remove short strings (except numbers)
             int tempInt;
-            var filteredTermList = termArr.Where(t => t.Length > 2 || int.TryParse(t, out tempInt));
+            var ignoreTerms = new List<string> { "ST", "RD", "CT", "LN", "PL" };
+            var termArr = term.ToUpper().Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            var shortTerms = termArr.Where(t => t.Length <= 2 && !int.TryParse(t, out tempInt) && !ignoreTerms.Contains(t));
+            var longTerms = termArr.Where(t => t.Length > 2 || int.TryParse(t, out tempInt));
 
-            foreach (var singleTerm in filteredTermList)
+            foreach (var longTerm in longTerms)
             {
-                var personMatches = this.Repository.GetAll<Person>()
-                    .Where(p => p.FirstName.ToLower().Contains(singleTerm) || p.LastName.ToLower().Contains(singleTerm))
+                personMatches = this.Repository.GetAll<Person>()
+                    .Where(p => p.FirstName.Contains(longTerm) || p.LastName.Contains(longTerm))
                     .Include(p => p.Address)
                     .ToList();
 
-                var addressMatches = this.Repository.GetAll<Address>()
-                    .Where(p => p.Street.ToLower().Contains(singleTerm) || p.Zip.ToLower().Contains(singleTerm))
+                var scoreModifier = 2;
+                if (personMatches.Count < 50 )
+                {
+                    scoreModifier = 4;
+                }
+                else if (personMatches.Count < 200)
+                {
+                    scoreModifier = 3;
+                }
+                
+                addressMatches = this.Repository.GetAll<Address>()
+                    .Where(p => p.StreetName.Contains(longTerm) || p.StreetNumber == longTerm)
                     .Include(a => a.People)
                     .ToList();
 
-                this.CreateOrUpdatePersonMatches(personMatches, results);
-                this.CreateOrUpdateAddressMatches(addressMatches, personMatches, results);
+                this.CreateOrUpdatePersonMatches(personMatches, addressAggregateMatches, results, scoreModifier);
+                this.CreateOrUpdateAddressMatches(addressMatches, addressAggregateMatches, results, 2);
             }
 
-            return results.OrderByDescending(r => r.Strength).ThenByDescending(r => r.Type).ThenBy(r => r.Text);
+            foreach (var shortTerm in shortTerms)
+            {
+                addressMatches = addressAggregateMatches
+                    .Where(p => p.StreetName == shortTerm).Distinct().ToList();
+                this.CreateOrUpdateAddressMatches(addressMatches, addressAggregateMatches, results, 2);  
+
+                addressMatches = addressAggregateMatches
+                    .Where(p => p.StreetQuadrant == shortTerm).Distinct().ToList();
+                this.CreateOrUpdateAddressMatches(addressMatches, addressAggregateMatches, results, 1);                
+            }
+
+            return results
+                .Where(r => r.Strength > 3)
+                .OrderByDescending(r => r.Strength)
+                .ThenByDescending(r => r.Type)
+                .ThenBy(r => r.Text);
         }
 
-        private void CreateOrUpdatePersonMatches(IEnumerable<Person> matches, IList<SearchResult> results)
+        private void CreateOrUpdatePersonMatches(IEnumerable<Person> matches, List<Address> aggregateMatches, IList<SearchResult> results, int strengthModifier)
         {
             foreach (var personMatch in matches)
             {
@@ -85,17 +113,19 @@ namespace dc_snoop.Domain
                             Type = SearchResultType.Person.DisplayName(),
                             Id = personMatch.Id,
                             Text = $"{personMatch.FullName}{addressPortion}",
-                            Strength = 1
+                            Strength = strengthModifier
                         });
+
+                    aggregateMatches.Add(personMatch.Address);
                 }
                 else
                 {
-                    existingResult.Strength++;
+                    existingResult.Strength += strengthModifier;
                 }
             }
         }
 
-        private void CreateOrUpdateAddressMatches(IEnumerable<Address> matches, IEnumerable<Person> personMatches, IList<SearchResult> results)
+        private void CreateOrUpdateAddressMatches(List<Address> matches, List<Address> aggregateMatches, IList<SearchResult> results, int strengthModifier)
         {
             foreach (var addressMatch in matches)
             {
@@ -109,16 +139,24 @@ namespace dc_snoop.Domain
 
                 if (existingResult == null)
                 {
-                    results.Add(new SearchResult { Type = SearchResultType.Address.DisplayName(), Id = addressMatch.Id, Text = addressMatch.FullAddress, Strength = 1 });
+                    results.Add(new SearchResult 
+                        { 
+                            Type = SearchResultType.Address.DisplayName(), 
+                            Id = addressMatch.Id, 
+                            Text = addressMatch.FullAddress, 
+                            Strength = strengthModifier 
+                        });
+
+                    aggregateMatches.Add(addressMatch);
                 }
                 else
                 {
-                    existingResult.Strength++;
+                    existingResult.Strength += strengthModifier;
                 }
 
                 foreach(var peopleResult in existingPeopleResults)
                 {
-                    peopleResult.Strength++;
+                    peopleResult.Strength += strengthModifier;
                 }
             }
         }

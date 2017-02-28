@@ -8,9 +8,10 @@ using dc_snoop.DAL;
 namespace dcsnoop.Migrations
 {
     [DbContext(typeof(SnoopContext))]
-    partial class SnoopContextModelSnapshot : ModelSnapshot
+    [Migration("20170225225845_AddIndexes")]
+    partial class AddIndexes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
             modelBuilder
                 .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn)

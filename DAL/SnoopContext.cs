@@ -15,5 +15,13 @@ namespace dc_snoop.DAL
         public SnoopContext(DbContextOptions options) : base(options)
         {
         }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Address>().HasIndex(a => a.Street);
+            modelBuilder.Entity<Address>().HasIndex(a => a.StreetNumber);
+            modelBuilder.Entity<Address>().HasIndex(a => a.StreetName);
+            modelBuilder.Entity<Address>().HasIndex(a => a.StreetQuadrant);
+        }
     }
 }
