@@ -41,11 +41,11 @@ namespace dc_snoop.Domain
         {
             var scoreModifier = 2;
 
-            if (count < 50 )
+            if (count < 25 )
             {
                 scoreModifier = 4;
             }
-            else if (count < 200)
+            else if (count < 100)
             {
                 scoreModifier = 3;
             }
@@ -95,57 +95,59 @@ namespace dc_snoop.Domain
         }
 
         // Create search result for each person, or increase score if already matched on previous term
-        public void UpdatePersonSearchResults(IEnumerable<Person> matches, IList<SearchResult> searchResults, int strengthModifier)
+        public void UpdatePersonSearchResults(IEnumerable<Person> matches, IDictionary<string, SearchResult> searchResults, int strengthModifier)
         {
             foreach (var personMatch in matches)
             {
-                var existingResult = searchResults.SingleOrDefault(r => r.Type == SearchResultType.Person.DisplayName() && r.Id == personMatch.Id);
-
-                if (existingResult == null)
+                SearchResult existingResult;
+                var key = $"p{personMatch.Id}";
+                
+                if (searchResults.TryGetValue(key, out existingResult))
                 {
-                    var result = this.CreatePersonSearchResult(personMatch, strengthModifier);
-                    searchResults.Add(result);
+                    existingResult.Strength += strengthModifier;
                 }
                 else
                 {
-                    existingResult.Strength += strengthModifier;
+                    var result = this.CreatePersonSearchResult(personMatch, strengthModifier);
+                    searchResults.Add(key, result);
                 }
             }
         }
 
         // Create search result for each address, or increase score if already matched on previous term
-        public void UpdateAddressSearchResults(List<Address> matches, List<SearchResult> searchResults, int strengthModifier)
+        public void UpdateAddressSearchResults(List<Address> matches, IDictionary<string, SearchResult> searchResults, int strengthModifier)
         {
             foreach (var addressMatch in matches)
             {
-                var existingResult = searchResults
-                    .SingleOrDefault(r => r.Type == SearchResultType.Address.DisplayName() 
-                        && r.Id == addressMatch.Id);
+                SearchResult existingResult;
+                var key = $"a{addressMatch.Id}";
 
-                if (existingResult == null)
+                if (searchResults.TryGetValue(key, out existingResult))
                 {
-                    var result = this.CreateAddressSearchResult(addressMatch, strengthModifier);
-                    searchResults.Add(result);
+                    existingResult.Strength += strengthModifier;
                 }
                 else
                 {
-                    existingResult.Strength += strengthModifier;
+                    var result = this.CreateAddressSearchResult(addressMatch, strengthModifier);
+                    searchResults.Add(key, result);
                 }
             }
         }
 
         // Increase score for person that is a resident of an address if they already matched on another term
-        public void UpdateResidentSearchResults(List<Address> matches, List<SearchResult> searchResults, int strengthModifier)
+        public void UpdateResidentSearchResults(List<Address> matches, IDictionary<string, SearchResult> searchResults, int strengthModifier)
         {
             foreach (var addressMatch in matches)
             {
-                var existingPeopleResults = searchResults
-                    .Where(r => r.Type == SearchResultType.Person.DisplayName() 
-                        && addressMatch.People.Select(p => p.Id).Contains(r.Id));
+                var keys = addressMatch.People.Select(p => $"p{p.Id}");
 
-                foreach(var peopleResult in existingPeopleResults)
+                foreach(var key in keys)
                 {
-                    peopleResult.Strength += strengthModifier;
+                    SearchResult existingResult;
+                    if (searchResults.TryGetValue(key, out existingResult))
+                    {
+                        existingResult.Strength += strengthModifier;
+                    }
                 }
             }
         }

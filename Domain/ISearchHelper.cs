@@ -20,10 +20,10 @@ namespace dc_snoop.Domain
 
         List<Address> GetShortTermAddressMatches(IEnumerable<Address> searchList, string term);
 
-        void UpdatePersonSearchResults(IEnumerable<Person> matches, IList<SearchResult> searchResults, int strengthModifier);
+        void UpdatePersonSearchResults(IEnumerable<Person> matches, IDictionary<string, SearchResult> searchResults, int strengthModifier);
 
-        void UpdateAddressSearchResults(List<Address> matches, List<SearchResult> searchResults, int strengthModifier);
+        void UpdateAddressSearchResults(List<Address> matches, IDictionary<string, SearchResult> searchResults, int strengthModifier);
 
-        void UpdateResidentSearchResults(List<Address> matches, List<SearchResult> searchResults, int strengthModifier);
+        void UpdateResidentSearchResults(List<Address> matches, IDictionary<string, SearchResult> searchResults, int strengthModifier);
     }
 }

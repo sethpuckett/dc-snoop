@@ -36,27 +36,30 @@ namespace dc_snoop.Domain
 
         public IEnumerable<SearchResult> Search(string term)
         {
-            var results = new List<SearchResult>();
+            var results = new Dictionary<string, SearchResult>();
             var allAddressMatches = new List<Address>();
 
             // Separate long terms (full names, street numbers) from short terms(street letters, quadrants)
             var shortTerms = this.SearchHelper.GetShortSearchTerms(term);
             var longTerms = this.SearchHelper.GetLongSearchTerms(term);
 
-            // search all people and address for long term matches
+            // search all people for long term matches
             foreach (var longTerm in longTerms)
             {
                 var personMatches = this.SearchHelper.GetLongTermPersonMatches(longTerm);
-                var addressMatches = this.SearchHelper.GetLongTermAddressMatches(longTerm);
-
                 var scoreModifier = this.SearchHelper.GetLongTermCountScoreModifier(personMatches.Count);                
-
                 this.SearchHelper.UpdatePersonSearchResults(personMatches, results, scoreModifier);
-                this.SearchHelper.UpdateAddressSearchResults(addressMatches, results, 2);
-                this.SearchHelper.UpdateResidentSearchResults(addressMatches, results, 2);
-
                 allAddressMatches.AddRange(personMatches.Select(p => p.Address));
-                allAddressMatches.AddRange(addressMatches);
+            }
+
+            // search all address for long term matches
+            foreach (var longTerm in longTerms)
+            {
+                var addressMatches = this.SearchHelper.GetLongTermAddressMatches(longTerm);
+                var scoreModifier = this.SearchHelper.GetLongTermCountScoreModifier(addressMatches.Count);                
+                this.SearchHelper.UpdateAddressSearchResults(addressMatches, results, scoreModifier);
+                this.SearchHelper.UpdateResidentSearchResults(addressMatches, results, 2);
+                allAddressMatches.AddRange(addressMatches);                
             }
 
             // remove duplicate addresses from aggregate list.
@@ -73,7 +76,7 @@ namespace dc_snoop.Domain
                 this.SearchHelper.UpdateResidentSearchResults(addressShortMatches, results, 2);
             }
 
-            return results
+            return results.Values
                 .Where(r => r.Strength > 3)
                 .OrderByDescending(r => r.Strength)
                 .ThenByDescending(r => r.Type)
