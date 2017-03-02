@@ -1,0 +1,19 @@
+header {
+    text-align: center;
+}
+
+#content #search {
+    text-align: center;
+}
+
+#content #search #search-box {
+    width: 25%;
+}
+
+#content #search-results {
+    min-height: 250px;
+}
+
+#content #description {
+    padding: 25px;
+}

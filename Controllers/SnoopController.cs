@@ -4,10 +4,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using dc_snoop.DAL;
 using dc_snoop.Domain;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
 namespace dc_snoop.Controllers
 {
+    [EnableCors("CorsPolicy")]
     [Route("api")]
     public class SnoopController : Controller
     {
