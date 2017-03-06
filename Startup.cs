@@ -31,6 +31,11 @@ namespace dc_snoop
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            // Add framework services.
+            services.AddMvc().AddJsonOptions(options => {
+                options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+            });
+
             services.AddCors(options =>
                 {
                     options.AddPolicy("CorsPolicy",
@@ -39,11 +44,6 @@ namespace dc_snoop
                         .AllowAnyHeader()
                         .AllowCredentials() );
                 });
-            
-            // Add framework services.
-            services.AddMvc().AddJsonOptions(options => {
-                options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
-            });
 
             var connectionString = Configuration.GetConnectionString("SnoopDatabase");
             services.AddEntityFrameworkNpgsql().AddDbContext<SnoopContext>(options => options.UseNpgsql(connectionString));

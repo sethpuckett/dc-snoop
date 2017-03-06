@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace dc_snoop.Controllers
 {
-    [EnableCors("CorsPolicy")]
     [Route("api")]
     public class SnoopController : Controller
     {
@@ -35,6 +34,10 @@ namespace dc_snoop.Controllers
         [Route("search")]
         public IActionResult Search(string term)
         {
+            if (string.IsNullOrEmpty(term))
+            {
+                return Ok();
+            }
             return Ok(this.SnoopService.Search(term));
         }
     }

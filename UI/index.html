@@ -16,11 +16,34 @@
     </header>
     <div id="content">
         <div id="search">
-            <input id="search-box" type="text">
+            <input id="search-box" type="text" autofocus>
             <input id="search-button" type="button" value="Search">
         </div>
         <div id="search-results">
-
+            <div id="search-loading">
+                <img src="img/loading.gif">
+            </div>
+            <div id="results-view">
+                <ul id="results-list"></ul>
+            </div>
+            <div id="person-view">
+                <div id="person-back-to-search">Back to Search Results</div>
+                <div id="person-name">Name: <span id="person-name-value"></span></div>
+                <div id="person-address">Address: <span id="person-address-value"></span><span class="address-id"></span></div>
+                <div id="person-unit">Unit: <span id="person-unit-value"></span></div>
+                <div id="person-affiliation">Affiliation: <span id="person-affiliation-value"></span></div>
+                <div id="person-registration">RegistrationDate: <span id="person-registration-value"></span></div>
+            </div>
+            <div id="address-view">
+                <div id="address-back-to-search">Back to Search Results</div>
+                <div id="address-street">Address: <span id="address-street-value"></span></div>
+                <div id="address-precinct">Precinct: <span id="address-precinct-value"></span></div>
+                <div id="address-ward">Ward: <span id="address-ward-value"></span></div>
+                <div id="address-people">
+                    <div>People:</div>
+                    <ul id="address-people-list"></ul>
+                </div>
+            </div>
         </div>
         <div id="description">
             <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Similique nobis quos excepturi modi sed fugiat debitis deserunt quae sint ut laudantium quidem sapiente quasi, minima, doloremque odit fugit dolorem in!</p>

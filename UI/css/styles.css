@@ -17,3 +17,11 @@ header {
 #content #description {
     padding: 25px;
 }
+
+#search-loading, #results-view, #person-view, #address-view {
+    display: none;
+}
+
+.search-id, .search-type, .person-id, .address-id {
+    display: none;
+}
