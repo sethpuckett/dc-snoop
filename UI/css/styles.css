@@ -58,9 +58,14 @@ p {
     margin-bottom: 35px;
 }
 
+#search-box-container, #search-button-container {
+    display: inline-block;
+    vertical-align: top;
+}
+
 #content #search #search-box {
     width: 25%;
-    min-width: 200px;
+    min-width: 300px;
 }
 
 #search-description {
