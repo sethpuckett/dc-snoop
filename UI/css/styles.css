@@ -1,27 +1,193 @@
+* {
+    box-sizing: border-box;
+} 
+
+.clearfix:after {
+  content: ".";
+  display: block;
+  clear: both;
+  visibility: hidden;
+  line-height: 0;
+  height: 0;
+}
+
+body {
+    line-height: 1.4;
+}
+
+#main {
+   position: relative;
+}
+
+#main:after {
+    content : "";
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-image: url(../img/mitchel-washington-small.png); 
+    width: 100%;
+    height: 100%;
+    opacity : 0.07;
+    z-index: -1;
+}
+
 header {
+    padding-top: 25px;
     text-align: center;
+}
+
+header h1 {
+    font-size: 48px;
+    font-family: 'Diplomata SC', cursive;
+    margin-top: 0;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+input {
+    font-family: 'PT Serif', serif;
+}
+
+p {
+    font-family: 'PT Serif', serif;
 }
 
 #content #search {
     text-align: center;
+    margin-bottom: 35px;
 }
 
 #content #search #search-box {
     width: 25%;
+    min-width: 200px;
+}
+
+#search-description {
+    font-style: italic;
+    font-size: 10px;
+    color: #888888;
+    padding-top: 2px;
+    font-family: 'PT Serif', serif;
 }
 
 #content #search-results {
-    min-height: 250px;
+    min-height: 200px;
+    font-family: 'Inconsolata', monospace;
+    font-size: 18px;
+    margin-bottom: 35px;
 }
 
 #content #description {
-    padding: 25px;
+    width: 800px;
+    margin: 0 auto;
 }
 
 #search-loading, #results-view, #person-view, #address-view {
     display: none;
 }
 
-.search-id, .search-type, .person-id, .address-id {
-    display: none;
+#search-loading {
+    text-align: center;
 }
+
+#search-results {
+    width: 600px;
+    margin: 0 auto;
+}
+
+.results-container {
+    width: 50%;
+    float: left;
+    padding-top: 15px;
+}
+
+.map-container {
+    text-align: right;
+    width: 50%;
+    float: right;
+}
+
+#address-map, #person-map {
+    border: 1px solid #e35863;
+    width: 300px;
+    height: 242px;
+}
+
+#results-view {
+    padding-left: 120px;
+}
+
+#person-view, #address-view {
+    padding-left: 0px;
+}
+
+.back-to-search {
+    margin-bottom: 10px;
+}
+
+ul {
+    padding: 0;
+}
+
+li {
+    list-style-type: none;
+    list-style-position: inside;
+    padding: 2px;
+}
+
+a {
+    color: #e35863;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+@media screen and (max-width: 800px) {
+    #content #description {
+        width: 600px;
+    }
+}
+
+@media screen and (max-width: 600px) {
+    #search-results {
+        width: 100%;
+    }
+
+    .results-container {
+        width: 90%;
+        float: none;
+        padding-top: 15px;
+        text-align: center;
+    }
+
+    .map-container {
+        width: 90%;
+        float: none;
+        padding-top: 15px;
+        text-align: center;
+    }
+
+    #person-map, #address-map {
+        margin: 0 auto;
+    }
+
+    #content #description {
+        width: 100%;
+        padding: 10px;
+    }
+
+    #results-view {
+        padding-left: 0px;
+        text-align: center;
+    }
+}
+
+/*
+    font-family: 'Diplomata SC', cursive;
+    font-family: 'PT Serif', serif;
+    font-family: 'Inconsolata', monospace;
+*/

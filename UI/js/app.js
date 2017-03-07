@@ -1,11 +1,14 @@
+var mapSourceBase = "https://www.google.com/maps/embed/v1/place?key=AIzaSyB3O9zJ3W69fqz-N4cTMvfb785HlxqIuoU&q=";
+
 $(document).ready(function() {
     
     $("#search-button").on("click", search);
-    $(document).keypress(function(e) {
-        if(e.which === 13) {
-            e.preventDefault();
+
+    $(document).keypress(function(event) {
+        if(event.which === 13) {
+            event.preventDefault();
             if ($("#search-box").val() !== "") {
-                search();
+                search(event);
             }
         }
     });
@@ -13,20 +16,23 @@ $(document).ready(function() {
     $("#results-list").on("click", "li", selectSearchResult);
 
     $("#person-address").on("click", function(event) {
+        event.preventDefault();
         hideAllResults();
         $("#search-loading").show();
-        var id = $(this).find(".address-id").text();
+        var id = $(this).find(".address-id").val();
         showAddress(id);
     });
 
     $("#address-people-list").on("click", "li", function(event) {
+        event.preventDefault();
         hideAllResults();
         $("#search-loading").show();
-        var id = $(this).find(".person-id").text();
+        var id = $(this).find(".person-id").val();
         showPerson(id);
     });
 
-    $("#person-back-to-search, #address-back-to-search").on("click", function() {
+    $(".back-to-search").on("click", function() {
+        event.preventDefault();
         hideAllResults();
         $("#results-view").show();
     })
@@ -39,7 +45,8 @@ function hideAllResults() {
         $("#search-loading").hide();
 }
 
-function search() {
+function search(event) {
+    event.preventDefault();
     hideAllResults();
     $("#search-loading").show();
 
@@ -48,10 +55,10 @@ function search() {
     }).done(function(data) {
         $("#results-list").empty();
         $(data).each(function(index, result) {
-            $("#results-list").append("<li>" 
+            $("#results-list").append("<li><a href='#'>" 
                 + result.text 
-                + "<span class='search-id'>" + result.id + "</span>"
-                + "<span class='search-type'>" + result.type + "</span></li>");
+                + "<input type='hidden' class='search-id' value='" + result.id + "'>"
+                + "<input type='hidden' class='search-type' value='" + result.type + "'></a></li>");
         });
 
         $("#search-loading").hide();
@@ -59,12 +66,13 @@ function search() {
     });
 }
 
-function selectSearchResult() {
+function selectSearchResult(event) {
+    event.preventDefault();
     hideAllResults();
     $("#search-loading").show();
 
-    var id = $(this).find(".search-id").text();
-    var type = $(this).find(".search-type").text();
+    var id = $(this).find(".search-id").val();
+    var type = $(this).find(".search-type").val();
 
     if (type === "PERSON") {
         showPerson(id);
@@ -79,11 +87,18 @@ function showPerson(id) {
     }).done(function(data) { 
         $("#person-name-value").text(data.fullName);
         $("#person-address-value").text(data.address.fullAddress);
-        $("#person-address .address-id").text(data.address.id);
-        $("#person-unit-value").text(data.unit);
+        $("#person-address .address-id").val(data.address.id);
+        if (data.unit != "") {
+            $("#person-unit").show();
+            $("#person-unit-value").text(data.unit);
+        } else {
+            $("#person-unit").hide();
+        }
         $("#person-affiliation-value").text(data.affiliation);
         var date = new Date(data.registrationDate);
         $("#person-registration-value").text(date.toLocaleDateString());
+        var mapQuery = data.address.fullAddress.replace(/\s/g, "+") + "+Washington+DC";
+        $("#person-map iframe").attr("src", mapSourceBase + mapQuery);
 
         $("#search-loading").hide();
         $("#person-view").show();
@@ -98,11 +113,14 @@ function showAddress(id) {
         $("#address-precinct-value").text(data.precinct);
         $("#address-ward-value").text(data.ward);
         $("#address-people-list").empty();
+        var mapQuery = data.fullAddress.replace(/\s/g, "+") + "+Washington+DC";
+        $("#address-map iframe").attr("src", mapSourceBase + mapQuery);
         $(data.people).each(function(index, person) {
-            $("#address-people-list").append("<li>" 
+            $("#address-people-list").append("<li><a href='#'>" 
             + person.fullName
+            + "</a>"
             + (person.unit != "" ? " (" + person.unit + ")" : "")
-            + "<span class='person-id'>" + person.id + "</span></li>");
+            + "<input type='hidden' class='person-id' value='" + person.id + "'></li>");
         });
 
         $("#search-loading").hide();

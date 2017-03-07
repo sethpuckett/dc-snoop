@@ -7,10 +7,11 @@
     <meta name="keywords" content="dc, district of columbia, voter, registration">
     <title>DC Snoop</title>
     <link rel="stylesheet" href="css/normalize.css">
+    <link href="https://fonts.googleapis.com/css?family=Diplomata+SC|Inconsolata|PT+Serif" rel="stylesheet">
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-    
+    <div id="main">
     <header>
         <h1>DC Snoop</h1>
     </header>
@@ -18,8 +19,11 @@
         <div id="search">
             <input id="search-box" type="text" autofocus>
             <input id="search-button" type="button" value="Search">
+            <div id="search-description">
+                Search for a name or address in Washington, DC
+            </div>
         </div>
-        <div id="search-results">
+        <div id="search-results" class="clearfix">
             <div id="search-loading">
                 <img src="img/loading.gif">
             </div>
@@ -27,21 +31,45 @@
                 <ul id="results-list"></ul>
             </div>
             <div id="person-view">
-                <div id="person-back-to-search">Back to Search Results</div>
-                <div id="person-name">Name: <span id="person-name-value"></span></div>
-                <div id="person-address">Address: <span id="person-address-value"></span><span class="address-id"></span></div>
-                <div id="person-unit">Unit: <span id="person-unit-value"></span></div>
-                <div id="person-affiliation">Affiliation: <span id="person-affiliation-value"></span></div>
-                <div id="person-registration">RegistrationDate: <span id="person-registration-value"></span></div>
+                <div class="results-container">
+                    <div class="back-to-search"><a href="#">Back to Search Results</a></div>
+                    <div id="person-name"><strong>Name:</strong> <span id="person-name-value"></span></div>
+                    <div id="person-address"><strong>Address:</strong> <a href="#"><span id="person-address-value"></span></a><input type="hidden" class="address-id"></div>
+                    <div id="person-unit"><strong>Unit:</strong> <span id="person-unit-value"></span></div>
+                    <div id="person-affiliation"><strong>Affiliation:</strong> <span id="person-affiliation-value"></span></div>
+                    <div id="person-registration"><strong>Registration Date:</strong> <span id="person-registration-value"></span></div>
+                </div>
+                <div class="map-container">
+                    <div id="person-map">
+                        <iframe
+                            width="298"
+                            height="240"
+                            frameborder="0" style="border:0"
+                            src="https://www.google.com/maps/embed/v1/place?key=AIzaSyB3O9zJ3W69fqz-N4cTMvfb785HlxqIuoU&q=Washington+DC">
+                        </iframe>
+                    </div>
+                </div>
             </div>
             <div id="address-view">
-                <div id="address-back-to-search">Back to Search Results</div>
-                <div id="address-street">Address: <span id="address-street-value"></span></div>
-                <div id="address-precinct">Precinct: <span id="address-precinct-value"></span></div>
-                <div id="address-ward">Ward: <span id="address-ward-value"></span></div>
-                <div id="address-people">
-                    <div>People:</div>
-                    <ul id="address-people-list"></ul>
+                <div class="results-container">
+                    <div class="back-to-search"><a href="#">Back to Search Results</a></div>
+                    <div id="address-street"><strong>Address:</strong> <span id="address-street-value"></span></div>
+                    <div id="address-precinct"><strong>Precinct:</strong> <span id="address-precinct-value"></span></div>
+                    <div id="address-ward"><strong>Ward:</strong> <span id="address-ward-value"></span></div>
+                    <div id="address-people">
+                        <div><strong>Residents:</strong></div>
+                        <ul id="address-people-list"></ul>
+                    </div>
+                </div>
+                <div class="map-container">
+                    <div id="address-map">
+                        <iframe
+                            width="298"
+                            height="240"
+                            frameborder="0" style="border:0"
+                            src="https://www.google.com/maps/embed/v1/place?key=AIzaSyB3O9zJ3W69fqz-N4cTMvfb785HlxqIuoU&q=Washington+DC">
+                        </iframe>
+                    </div>
                 </div>
             </div>
         </div>
@@ -56,7 +84,7 @@
     <footer>
 
     </footer>
-
+    </div>
     <script
       src="http://code.jquery.com/jquery-3.1.1.min.js"
       integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
