@@ -6,10 +6,7 @@ $(document).ready(function() {
 
     $(document).keypress(function(event) {
         if(event.which === 13) {
-            event.preventDefault();
-            if ($("#search-box").val() !== "") {
-                search(event);
-            }
+            search(event);
         }
     });
 
@@ -47,23 +44,25 @@ function hideAllResults() {
 
 function search(event) {
     event.preventDefault();
-    hideAllResults();
-    $("#search-loading").show();
+    if ($("#search-box").val() != "") {
+        hideAllResults();
+        $("#search-loading").show();
 
-    $.ajax({
-        url: "http://localhost:5000/api/search?term=" + $("#search-box").val()
-    }).done(function(data) {
-        $("#results-list").empty();
-        $(data).each(function(index, result) {
-            $("#results-list").append("<li><a href='#'>" 
-                + result.text 
-                + "<input type='hidden' class='search-id' value='" + result.id + "'>"
-                + "<input type='hidden' class='search-type' value='" + result.type + "'></a></li>");
+        $.ajax({
+            url: "http://localhost:5000/api/search?term=" + $("#search-box").val()
+        }).done(function(data) {
+            $("#results-list").empty();
+            $(data).each(function(index, result) {
+                $("#results-list").append("<li><a href='#'>" 
+                    + result.text 
+                    + "<input type='hidden' class='search-id' value='" + result.id + "'>"
+                    + "<input type='hidden' class='search-type' value='" + result.type + "'></a></li>");
+            });
+
+            $("#search-loading").hide();
+            $("#results-view").show();
         });
-
-        $("#search-loading").hide();
-        $("#results-view").show();
-    });
+    }
 }
 
 function selectSearchResult(event) {
