@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace dc_snoop.Controllers
 {
-    [Route("api")]
+    [Route("")]
     public class SnoopController : Controller
     {
         private readonly ISnoopService SnoopService;
