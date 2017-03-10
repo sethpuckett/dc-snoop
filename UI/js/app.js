@@ -10,21 +10,21 @@ $(document).ready(function() {
         }
     });
 
-    $("#results-list").on("click", "li", selectSearchResult);
+    $("#results-list").on("click", "li a", selectSearchResult);
 
-    $("#person-address").on("click", function(event) {
+    $("#person-address a").on("click", function(event) {
         event.preventDefault();
         hideAllResults();
         $("#search-loading").show();
-        var id = $(this).find(".address-id").val();
+        var id = $(this).parent().find(".address-id").val();
         showAddress(id);
     });
 
-    $("#address-people-list").on("click", "li", function(event) {
+    $("#address-people-list").on("click", "li a", function(event) {
         event.preventDefault();
         hideAllResults();
         $("#search-loading").show();
-        var id = $(this).find(".person-id").val();
+        var id = $(this).parent().find(".person-id").val();
         showPerson(id);
     });
 
@@ -49,7 +49,7 @@ function search(event) {
         $("#search-loading").show();
 
         $.ajax({
-            url: "https://www.dcsnoop.com/api/search?term=" + $("#search-box").val()
+            url: "api/search?term=" + $("#search-box").val()
         }).done(function(data) {
             $("#results-list").empty();
             $(data).each(function(index, result) {
@@ -70,8 +70,8 @@ function selectSearchResult(event) {
     hideAllResults();
     $("#search-loading").show();
 
-    var id = $(this).find(".search-id").val();
-    var type = $(this).find(".search-type").val();
+    var id = $(this).parent().find(".search-id").val();
+    var type = $(this).parent().find(".search-type").val();
 
     if (type === "PERSON") {
         showPerson(id);
@@ -82,7 +82,7 @@ function selectSearchResult(event) {
 
 function showPerson(id) {
     $.ajax({
-        url: "https://www.dcsnoop.com/api/person/" + id
+        url: "api/person/" + id
     }).done(function(data) { 
         $("#person-name-value").text(data.fullName);
         $("#person-address-value").text(data.address.fullAddress);
@@ -106,7 +106,7 @@ function showPerson(id) {
 
 function showAddress(id) {
     $.ajax({
-        url: "https://www.dcsnoop.com/api/address/" + id
+        url: "api/address/" + id
     }).done(function(data) { 
         $("#address-street-value").text(data.fullAddress);
         $("#address-precinct-value").text(data.precinct);

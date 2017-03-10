@@ -13,6 +13,7 @@
 
 body {
     line-height: 1.4;
+    font-family: 'PT Serif', serif;
 }
 
 #main {
@@ -64,9 +65,8 @@ header h1 {
 	display:inline-block;
 	cursor:pointer;
 	color:#ffffff;
-	font-family: 'PT Serif', serif;
 	font-size:16px;
-	padding:4px 24px;
+	padding:5px 24px;
 	text-decoration:none;
 	text-shadow:0px 1px 0px #854629;
 }
@@ -88,16 +88,13 @@ header h1 {
 }
 
 #search-box {
-    border-radius: 3px;
-    padding-top: 3px;
-    padding-bottom: 3px;
+    border-radius: 5px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 5px;
 }
 
 input {
-    font-family: 'PT Serif', serif;
-}
-
-p {
     font-family: 'PT Serif', serif;
 }
 
@@ -111,7 +108,7 @@ p {
     vertical-align: top;
 }
 
-#content #search #search-box {
+#search-box {
     width: 25%;
     min-width: 300px;
 }
@@ -121,7 +118,6 @@ p {
     font-size: 10px;
     color: #888888;
     padding-top: 2px;
-    font-family: 'PT Serif', serif;
 }
 
 #content #search-results {
@@ -200,6 +196,15 @@ a:hover {
     text-decoration: underline;
 }
 
+footer {
+    padding-top: 25px;
+    padding-bottom: 25px;
+}
+
+#data-update-notice {
+    text-align: center;
+}
+
 @media screen and (max-width: 800px) {
     #content #description {
         width: 600px;
@@ -207,21 +212,30 @@ a:hover {
 }
 
 @media screen and (max-width: 600px) {
-    #search-results {
+
+    #main, #search-results {
         width: 100%;
     }
 
     .results-container {
-        width: 90%;
+        width: 100%;
         float: none;
-        padding-top: 15px;
+        padding: 10px;
         text-align: center;
     }
 
+    #search-box-container {
+        display: block;
+    }
+
+    #search-button-container {
+        margin-top: 10px;
+    }
+
     .map-container {
-        width: 90%;
+        width: 100%;
         float: none;
-        padding-top: 15px;
+        padding-top: 10px;
         text-align: center;
     }
 
