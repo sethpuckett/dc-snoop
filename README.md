@@ -2,7 +2,7 @@
 
 DC Snoop is web application that provides a searchable database of Washington, DC voter registration information. It is built using ASP.Net Core, Entity Framework Core, PostgreSQL, and a little HTML and jQuery for the UI.
 
-![DC Snoop Banner](/img/banner.png)
+![DC Snoop Banner](/img/long-banner.png)
 
 ## Setup
 
