@@ -16,17 +16,17 @@ This is a standard ASP.Net Core application, so it follows the standard ASP.NET 
 * Update the connection string in `appsettings.json` to match the settings you used when installing PostgreSQL.
 
 ### Build and Run
-1. Restoring Nuget depencencies - From the root directory on the command line run
+* Restoring Nuget depencencies - From the root directory on the command line run
 ```
 dotnet restore
 ```
 
-2. Setup the database - From the root directory on the command line run
+* Setup the database - From the root directory on the command line run
 ```
 dotnet ef database update
 ```
 
-3. Build and run - From the root directory on the command line run
+* Build and run - From the root directory on the command line run
 ```
 dotnet run
 ```
@@ -38,7 +38,7 @@ http://localhost:5000/api/address/{id}
 http://localhost:5000/api/search?term={search_terms}
 ```
 
-4. In the `UI` folder open `index.html` in your favorite browser to view the UI. You may need to update the URL used for AJAX calls within `UI/js/app.js` to connect to your locally running API.
+* In the `UI` folder open `index.html` in your favorite browser to view the UI. You may need to update the URL used for AJAX calls within `UI/js/app.js` to connect to your locally running API.
 
 ### Additional Notes
 
