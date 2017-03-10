@@ -13,7 +13,7 @@ This is a standard ASP.Net Core application, so it follows the standard ASP.NET 
 * Install and run [PostgreSQL](https://www.postgresql.org/)
 
 ### Updating the configuration
-* Update the connection string in appsettings.json to match the settings you used when installing PostgreSQL.
+* Update the connection string in `appsettings.json` to match the settings you used when installing PostgreSQL.
 
 ### Build and Run
 1. Restoring Nuget depencencies - From the root directory on the command line run
