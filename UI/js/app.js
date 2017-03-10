@@ -49,7 +49,7 @@ function search(event) {
         $("#search-loading").show();
 
         $.ajax({
-            url: "http://localhost:5000/api/search?term=" + $("#search-box").val()
+            url: "https://www.dcsnoop.com/api/search?term=" + $("#search-box").val()
         }).done(function(data) {
             $("#results-list").empty();
             $(data).each(function(index, result) {
@@ -82,7 +82,7 @@ function selectSearchResult(event) {
 
 function showPerson(id) {
     $.ajax({
-        url: "http://localhost:5000/api/person/" + id
+        url: "https://www.dcsnoop.com/api/person/" + id
     }).done(function(data) { 
         $("#person-name-value").text(data.fullName);
         $("#person-address-value").text(data.address.fullAddress);
@@ -106,7 +106,7 @@ function showPerson(id) {
 
 function showAddress(id) {
     $.ajax({
-        url: "http://localhost:5000/api/address/" + id
+        url: "https://www.dcsnoop.com/api/address/" + id
     }).done(function(data) { 
         $("#address-street-value").text(data.fullAddress);
         $("#address-precinct-value").text(data.precinct);
