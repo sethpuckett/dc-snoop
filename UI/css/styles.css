@@ -205,6 +205,11 @@ footer {
     text-align: center;
 }
 
+#disabled-banner {
+    text-align: center;
+    font-weight: bold;
+}
+
 @media screen and (max-width: 800px) {
     #content #description {
         width: 600px;

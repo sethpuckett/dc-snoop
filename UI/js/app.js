@@ -44,7 +44,7 @@ function hideAllResults() {
 
 function search(event) {
     event.preventDefault();
-    if ($("#search-box").val() != "") {
+    /*if ($("#search-box").val() != "") {
         hideAllResults();
         $("#search-loading").show();
 
@@ -62,7 +62,7 @@ function search(event) {
             $("#search-loading").hide();
             $("#results-view").show();
         });
-    }
+    }*/
 }
 
 function selectSearchResult(event) {
